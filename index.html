@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mortadha Hasnaoui — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --indigo:#4f46e5;--pink:#ec4899;--cyan:#06b6d4;--amber:#f59e0b;
+  --bg:#070713;--bg2:#0d0d1a;--bg3:#111126;
+  --text:#e2e8f0;--muted:#94a3b8;--border:#1e2040;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--indigo),var(--pink));border-radius:3px;}
+
+/* CURSOR */
+#cursor-dot{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--cyan);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s;box-shadow:0 0 10px var(--cyan),0 0 20px var(--cyan);}
+#cursor-ring{position:fixed;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--pink);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .12s ease,top .12s ease;opacity:.7;}
+
+/* NOISE */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5;}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:opacity .8s,visibility .8s;}
+#loader.hide{opacity:0;visibility:hidden;}
+.loader-initials{font-family:'Syne',sans-serif;font-size:72px;font-weight:800;background:linear-gradient(135deg,var(--indigo),var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:pulse 1.5s ease-in-out infinite;}
+.loader-bar-wrap{width:200px;height:3px;background:#1e2040;border-radius:2px;overflow:hidden;}
+.loader-bar{height:100%;width:0;border-radius:2px;background:linear-gradient(90deg,var(--indigo),var(--pink),var(--cyan),var(--amber));animation:loadbar 1.8s ease forwards;}
+@keyframes loadbar{to{width:100%;}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* CANVAS */
+#particles{position:fixed;inset:0;z-index:1;pointer-events:none;}
+
+/* NAVBAR */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 6%;display:flex;align-items:center;justify-content:space-between;height:70px;background:rgba(7,7,19,.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transform:translateY(-100%);animation:slideDown .6s .5s forwards;}
+@keyframes slideDown{to{transform:translateY(0);}}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;background:linear-gradient(90deg,var(--indigo),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{color:var(--muted);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;position:relative;transition:color .3s;}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:linear-gradient(90deg,var(--indigo),var(--pink));transition:width .3s;}
+.nav-links a:hover{color:var(--text);}
+.nav-links a:hover::after{width:100%;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+.hamburger span{width:24px;height:2px;background:var(--text);border-radius:1px;}
+
+/* SECTIONS */
+section{position:relative;z-index:2;padding:100px 6%;}
+.section-label{display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);margin-bottom:12px;}
+.section-label::before{content:'';width:20px;height:1px;background:var(--cyan);}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;color:var(--text);margin-bottom:48px;line-height:1.1;}
+.section-title span{background:linear-gradient(135deg,var(--indigo),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;padding-top:120px;padding-bottom:60px;}
+.hero-inner{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.hero-avail{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;border:1px solid rgba(6,182,212,.3);background:rgba(6,182,212,.07);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--cyan);margin-bottom:24px;}
+.avail-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero-name{font-family:'Syne',sans-serif;font-size:clamp(40px,6vw,76px);font-weight:800;line-height:1.05;margin-bottom:18px;background:linear-gradient(135deg,#fff 0%,var(--indigo) 30%,var(--pink) 60%,var(--cyan) 90%,#fff 100%);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 5s linear infinite;}
+@keyframes shimmer{0%{background-position:0%;}100%{background-position:300%;}}
+.hero-sub{font-family:'DM Sans',sans-serif;font-size:18px;color:var(--muted);margin-bottom:36px;line-height:1.6;}
+.hero-sub strong{color:var(--text);}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;}
+.btn-primary{padding:14px 28px;border-radius:10px;background:linear-gradient(135deg,var(--indigo),var(--pink));color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;text-decoration:none;transition:transform .3s,box-shadow .3s;border:none;cursor:pointer;}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(79,70,229,.4);}
+.btn-outline{padding:13px 27px;border-radius:10px;border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;text-decoration:none;transition:all .3s;background:transparent;}
+.btn-outline:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 20px rgba(6,182,212,.2);}
+
+/* 3D CARD */
+.hero-right{display:flex;justify-content:center;align-items:center;position:relative;}
+.orb{position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,.3),transparent 70%);filter:blur(40px);animation:orbFloat 4s ease-in-out infinite;}
+@keyframes orbFloat{0%,100%{transform:scale(1) translateY(0);}50%{transform:scale(1.1) translateY(-10px);}}
+.spin-ring{position:absolute;width:280px;height:280px;border-radius:50%;border:2px dashed rgba(79,70,229,.4);animation:spin 12s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spin-ring2{position:absolute;width:310px;height:310px;border-radius:50%;border:1px dashed rgba(236,72,153,.25);animation:spin 18s linear infinite reverse;}
+.hero-card{position:relative;width:240px;height:300px;border-radius:24px;background:linear-gradient(135deg,rgba(13,13,26,.95),rgba(17,17,38,.95));border:1px solid rgba(79,70,229,.3);padding:32px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;animation:float3d 5s ease-in-out infinite;transform-style:preserve-3d;box-shadow:0 20px 80px rgba(0,0,0,.5),0 0 40px rgba(79,70,229,.15),inset 0 1px 0 rgba(255,255,255,.05);}
+@keyframes float3d{0%,100%{transform:translateY(0) rotateY(-5deg) rotateX(3deg);}50%{transform:translateY(-16px) rotateY(5deg) rotateX(-3deg);}}
+.card-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--pink));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;}
+.card-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);text-align:center;}
+.card-role{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);text-align:center;line-height:1.5;}
+.card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;margin-top:8px;}
+.stat{text-align:center;padding:8px 4px;border-radius:8px;background:rgba(255,255,255,.04);}
+.stat-num{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--cyan);}
+.stat-label{font-family:'DM Sans',sans-serif;font-size:9px;color:var(--muted);margin-top:2px;}
+
+/* MARQUEE */
+.marquee-section{padding:30px 0;overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(13,13,26,.5);}
+.marquee-track{display:flex;gap:0;width:max-content;animation:marquee 20s linear infinite;}
+.marquee-item{padding:0 40px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:12px;}
+.marquee-item::after{content:'·';color:var(--border);}
+@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%)}}
+
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 60px;margin-bottom:60px;}
+.skill-item{}
+.skill-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.skill-name{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text);}
+.skill-pct{font-family:'Syne',sans-serif;font-size:12px;color:var(--muted);}
+.skill-track{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.skill-fill{height:100%;width:0;border-radius:3px;transition:width 1.5s cubic-bezier(.25,.46,.45,.94);position:relative;overflow:hidden;}
+.skill-fill::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:none;}
+.skill-fill.done::after{animation:sweep 1s .5s forwards;}
+@keyframes sweep{to{left:200%;}}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{padding:7px 14px;border-radius:8px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);background:rgba(255,255,255,.02);transition:all .3s;cursor:default;}
+.chip:hover{transform:translateY(-4px);color:var(--text);border-color:var(--indigo);background:rgba(79,70,229,.1);box-shadow:0 8px 20px rgba(79,70,229,.2);}
+
+/* EXPERIENCE */
+.timeline{position:relative;padding-left:40px;}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(var(--indigo),var(--pink),var(--cyan));}
+.timeline-item{position:relative;margin-bottom:48px;padding:28px 28px;border-radius:16px;background:rgba(13,13,26,.8);border:1px solid var(--border);transition:all .4s;}
+.timeline-item:hover{transform:translateX(6px);border-color:rgba(79,70,229,.4);box-shadow:0 8px 40px rgba(79,70,229,.15),-4px 0 20px rgba(79,70,229,.1);}
+.timeline-dot{position:absolute;left:-49px;top:28px;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--pink));border:3px solid var(--bg);box-shadow:0 0 12px rgba(79,70,229,.5);}
+.exp-meta{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:6px;}
+.exp-company-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--cyan);}
+.exp-date-loc{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);}
+.exp-title-main{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;}
+.exp-desc{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;}
+.badge-row{display:flex;flex-wrap:wrap;gap:6px;}
+.badge{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;}
+.badge-indigo{background:rgba(79,70,229,.15);color:#a5b4fc;border:1px solid rgba(79,70,229,.3);}
+.badge-pink{background:rgba(236,72,153,.12);color:#f9a8d4;border:1px solid rgba(236,72,153,.25);}
+.badge-cyan{background:rgba(6,182,212,.12);color:#67e8f9;border:1px solid rgba(6,182,212,.25);}
+.badge-amber{background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.25);}
+
+/* PROJECTS */
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.proj-card{border-radius:16px;background:rgba(13,13,26,.9);border:1px solid var(--border);padding:24px;transition:all .4s;position:relative;overflow:hidden;}
+.proj-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:2px;background:linear-gradient(90deg,var(--indigo),var(--pink),var(--cyan));transition:left .4s;}
+.proj-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(0,0,0,.4);border-color:rgba(79,70,229,.3);}
+.proj-card:hover::before{left:0;}
+.proj-emoji{font-size:32px;margin-bottom:14px;display:block;}
+.proj-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.proj-desc{font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+.proj-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.proj-tag{padding:3px 8px;border-radius:5px;font-size:10.5px;font-family:'DM Sans',sans-serif;font-weight:500;}
+
+/* EDUCATION */
+.edu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:48px;}
+.edu-card{border-radius:16px;background:rgba(13,13,26,.8);border:1px solid var(--border);padding:28px;transition:all .3s;position:relative;overflow:hidden;}
+.edu-card::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(var(--indigo),var(--pink));}
+.edu-card:hover{border-color:rgba(79,70,229,.4);box-shadow:0 8px 40px rgba(79,70,229,.12);}
+.edu-degree{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.edu-school{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--cyan);margin-bottom:4px;}
+.edu-dates{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);margin-bottom:10px;}
+.edu-score{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;font-weight:600;background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);}
+.lang-badges{display:flex;flex-wrap:wrap;gap:12px;}
+.lang-badge{padding:10px 20px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.02);display:flex;align-items:center;gap:10px;transition:all .3s;}
+.lang-badge:hover{border-color:var(--pink);background:rgba(236,72,153,.07);}
+.lang-badge-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text);}
+.lang-badge-level{font-size:11px;font-family:'DM Sans',sans-serif;color:var(--muted);}
+.lang-dot{width:8px;height:8px;border-radius:50%;}
+
+/* CONTACT */
+.contact-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.contact-cards{display:flex;flex-direction:column;gap:14px;}
+.contact-card{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:12px;background:rgba(13,13,26,.8);border:1px solid var(--border);transition:all .3s;}
+.contact-card:hover{transform:translateX(8px);border-color:rgba(79,70,229,.4);box-shadow:0 8px 30px rgba(79,70,229,.1);}
+.contact-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.contact-label{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);margin-bottom:2px;}
+.contact-val{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);font-weight:500;}
+.contact-right{display:flex;justify-content:center;align-items:center;position:relative;}
+.ripple-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--pink));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;position:relative;z-index:2;}
+.ripple{position:absolute;border-radius:50%;border:1.5px solid rgba(79,70,229,.4);animation:rippleOut 3s ease-out infinite;}
+.ripple:nth-child(2){width:140px;height:140px;animation-delay:.8s;}
+.ripple:nth-child(3){width:190px;height:190px;animation-delay:1.6s;}
+.ripple:nth-child(4){width:240px;height:240px;animation-delay:2.4s;}
+@keyframes rippleOut{0%{opacity:1;transform:scale(.8);}100%{opacity:0;transform:scale(1.2);}}
+
+/* REVEAL ANIMATIONS */
+.reveal{opacity:0;transition:opacity .7s ease,transform .7s ease;}
+.reveal.fade-up{transform:translateY(40px);}
+.reveal.slide-left{transform:translateX(-40px);}
+.reveal.slide-right{transform:translateX(40px);}
+.reveal.visible{opacity:1;transform:none;}
+
+/* FOOTER */
+footer{text-align:center;padding:32px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);border-top:1px solid var(--border);position:relative;z-index:2;}
+footer span{color:var(--pink);}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero-inner,.contact-inner{grid-template-columns:1fr;}
+  .hero-right{margin-top:40px;}
+  .projects-grid{grid-template-columns:1fr 1fr;}
+  .skills-grid{grid-template-columns:1fr;}
+  .hamburger{display:flex;}
+  .nav-links{display:none;position:absolute;top:70px;left:0;right:0;flex-direction:column;background:rgba(7,7,19,.97);padding:24px 6%;gap:20px;border-bottom:1px solid var(--border);}
+  .nav-links.open{display:flex;}
+}
+@media(max-width:600px){
+  .projects-grid{grid-template-columns:1fr;}
+  section{padding:80px 5%;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-initials">MH</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
+
+<!-- CANVAS -->
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo">Mortadha.</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#hero" onclick="closeMenu()">Home</a></li>
+    <li><a href="#skills" onclick="closeMenu()">Skills</a></li>
+    <li><a href="#experience" onclick="closeMenu()">Experience</a></li>
+    <li><a href="#projects" onclick="closeMenu()">Projects</a></li>
+    <li><a href="#education" onclick="closeMenu()">Education</a></li>
+    <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+  </ul>
+  <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-left reveal fade-up">
+      <div class="hero-avail"><div class="avail-dot"></div>Open to Opportunities</div>
+      <h1 class="hero-name">Mortadha<br>Hasnaoui</h1>
+      <p class="hero-sub"><strong>Electronics & Embedded Systems Engineer</strong><br>Production Planning Specialist · Tunis/Sousse, Tunisia</p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-primary">Get in Touch</a>
+        <a href="#experience" class="btn-outline">View Experience</a>
+      </div>
+    </div>
+    <div class="hero-right reveal fade-up" style="transition-delay:.3s">
+      <div class="orb"></div>
+      <div class="spin-ring"></div>
+      <div class="spin-ring2"></div>
+      <div class="hero-card">
+        <div class="card-avatar">MH</div>
+        <div class="card-name">Mortadha Hasnaoui</div>
+        <div class="card-role">Electronics & Embedded Systems Engineer<br>Production Planning Specialist</div>
+        <div class="card-stats">
+          <div class="stat"><div class="stat-num">5+</div><div class="stat-label">Roles</div></div>
+          <div class="stat"><div class="stat-num">26</div><div class="stat-label">Age</div></div>
+          <div class="stat"><div class="stat-num">C1</div><div class="stat-label">English</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marquee">
+    <span class="marquee-item">LEONI Tunisia</span>
+    <span class="marquee-item">Timsoft Group</span>
+    <span class="marquee-item">Medal Sustainable Technologies</span>
+    <span class="marquee-item">JUSTICA SEKUR</span>
+    <span class="marquee-item">STEG Tunisia</span>
+    <span class="marquee-item">BMW U11 ICE Series</span>
+    <span class="marquee-item">University of Tunis Manar</span>
+    <span class="marquee-item">SAP ERP</span>
+    <span class="marquee-item">JIT/JIS Scheduling</span>
+    <span class="marquee-item">Embedded Systems</span>
+    <span class="marquee-item">IoT Development</span>
+    <span class="marquee-item">LEONI Tunisia</span>
+    <span class="marquee-item">Timsoft Group</span>
+    <span class="marquee-item">Medal Sustainable Technologies</span>
+    <span class="marquee-item">JUSTICA SEKUR</span>
+    <span class="marquee-item">STEG Tunisia</span>
+    <span class="marquee-item">BMW U11 ICE Series</span>
+    <span class="marquee-item">University of Tunis Manar</span>
+    <span class="marquee-item">SAP ERP</span>
+    <span class="marquee-item">JIT/JIS Scheduling</span>
+    <span class="marquee-item">Embedded Systems</span>
+    <span class="marquee-item">IoT Development</span>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">Expertise</div>
+  <h2 class="section-title">Skills & <span>Technologies</span></h2>
+
+  <div class="skills-grid" id="skillBars">
+    <!-- filled by JS -->
+  </div>
+
+  <div class="chips-wrap" id="chipCloud"></div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">Career</div>
+  <h2 class="section-title">Work <span>Experience</span></h2>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">Portfolio</div>
+  <h2 class="section-title">Personal <span>Projects</span></h2>
+  <div class="projects-grid" id="projectsGrid"></div>
+</section>
+
+<!-- EDUCATION & LANGUAGES -->
+<section id="education">
+  <div class="section-label">Learning</div>
+  <h2 class="section-title">Education & <span>Languages</span></h2>
+  <div class="edu-grid" id="eduGrid"></div>
+  <div style="margin-bottom:24px;"><div class="section-label" style="margin-bottom:16px;">Languages</div></div>
+  <div class="lang-badges" id="langBadges"></div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">Connect</div>
+  <h2 class="section-title">Get in <span>Touch</span></h2>
+  <div class="contact-inner">
+    <div class="contact-cards reveal slide-left" id="contactCards"></div>
+    <div class="contact-right reveal slide-right" style="transition-delay:.2s">
+      <div class="ripple ripple-2"></div>
+      <div class="ripple ripple-3"></div>
+      <div class="ripple ripple-4"></div>
+      <div class="ripple-avatar">MH</div>
+    </div>
+  </div>
+</section>
+
+<footer>Built with ❤️ by <span>Mortadha Hasnaoui</span> · Electronics & Embedded Systems Engineer · 2025</footer>
+
+<script>
+/* ── DATA ────────────────────────────────────────── */
+const skills=[
+  {name:'Python',pct:90,color:'linear-gradient(90deg,#4f46e5,#ec4899)'},
+  {name:'C / C++',pct:82,color:'linear-gradient(90deg,#06b6d4,#4f46e5)'},
+  {name:'MATLAB / Simulink',pct:80,color:'linear-gradient(90deg,#f59e0b,#ec4899)'},
+  {name:'VHDL / Verilog',pct:72,color:'linear-gradient(90deg,#ec4899,#f59e0b)'},
+  {name:'SAP ERP / Production Planning',pct:85,color:'linear-gradient(90deg,#4f46e5,#06b6d4)'},
+  {name:'Embedded Systems (ARM, STM32, ESP32)',pct:88,color:'linear-gradient(90deg,#06b6d4,#ec4899)'},
+  {name:'IoT & Sensor Integration',pct:84,color:'linear-gradient(90deg,#f59e0b,#4f46e5)'},
+  {name:'Flask / Web Development',pct:74,color:'linear-gradient(90deg,#ec4899,#06b6d4)'},
+  {name:'Machine Learning / PyTorch',pct:70,color:'linear-gradient(90deg,#4f46e5,#f59e0b)'},
+  {name:'PID Control / ROS',pct:75,color:'linear-gradient(90deg,#06b6d4,#f59e0b)'},
+];
+
+const chips=['Python','C/C++','MATLAB','Simulink','VHDL','Verilog','Java','Go','JavaScript','HTML/CSS','Raspberry Pi','Arduino','STM32','ESP32','FPGA','ARM Cortex-M','SAP ERP','JIT/JIS','FreeRTOS','Flask','Django','PyTorch','Flask','Selenium','Robot Framework','UART','I2C','SPI','CAN','LoRaWAN','MQTT','Docker','InfluxDB','Firebase','MongoDB','Flutter','OpenCV','LabVIEW','Tia Portal','CODESYS','Linux','Git','Agile/Scrum'];
+
+const experience=[
+  {
+    company:'LEONI Tunisia',
+    loc:'Tunis / Sousse · Jul 2025 – Present',
+    role:'Production Planning Specialist – BMW U11 ICE Series',
+    desc:'Oversaw production scheduling and launch readiness for BMW U11 ICE Series wiring systems, ensuring full alignment between JIT/JIS customer demand, production capacity and material flow via SAP ERP. Coordinated daily and weekly plans across logistics, engineering and manufacturing. Drove digitalization initiatives integrating embedded systems for real-time production monitoring and predictive maintenance.',
+    badges:['SAP ERP','JIT/JIS','Python','Excel Macros','Process Optimization','BMW Standards'],
+    bc:'indigo'
+  },
+  {
+    company:'Timsoft Group',
+    loc:'Tunis · Jan 2024 – Jul 2024',
+    role:'Graduate Electronics & Embedded Software Engineer',
+    desc:'Designed IoT and facial recognition systems using Raspberry Pi, Python, and Flask for automation and monitoring. Integrated sensors and communication protocols to enhance device connectivity and performance.',
+    badges:['Raspberry Pi','Python','Flask','Firebase','MongoDB','Flutter','Android Studio','GPIO'],
+    bc:'pink'
+  },
+  {
+    company:'Medal Sustainable Technologies',
+    loc:'Tunis / Sousse · Jul 2023 – Oct 2023',
+    role:'Electronics & Embedded Systems Engineer Intern',
+    desc:'Designed and simulated PMSM motor and manipulator arm control using MATLAB/Simulink and ROS. Implemented and optimized PID control strategies for improved dynamic performance.',
+    badges:['MATLAB','Simulink','ROS','LabVIEW','Myrio Card','PID Control','Signal Processing'],
+    bc:'cyan'
+  },
+  {
+    company:'JUSTICA, SEKUR',
+    loc:'France (Remote) · Jun 2023 – Aug 2023',
+    role:'Software Engineering Intern',
+    desc:'Developed a prototype for an IoT-based alarm system ensuring encrypted device–server communication. Contributed to software updates to improve performance and fix security vulnerabilities.',
+    badges:['Linux','Python','Raspberry Pi','SSH','TCP/IP','HTTP','FTP','Shell Scripting'],
+    bc:'amber'
+  },
+  {
+    company:'STEG (Tunisian Company of Electricity & Gas)',
+    loc:'Tunis · Jun 2022 – Aug 2022',
+    role:'Electronics Engineering Intern',
+    desc:'Assisted in maintenance and troubleshooting of electrical systems alongside technical teams. Focused on minimizing downtime and ensuring reliability and safety compliance.',
+    badges:['Electrical Maintenance','Troubleshooting','Inspections','Documentation'],
+    bc:'pink'
+  },
+];
+
+const projects=[
+  {emoji:'🤖',name:'Object Detection Robot',desc:'Mobile robot with AI-based obstacle avoidance using ESP32-CAM, OpenCV, and PyTorch. BLE + RF communication.',tags:['PyTorch','OpenCV','STM32','ESP32-CAM','Python','BLE','SOLIDWORKS'],tc:'indigo'},
+  {emoji:'🏭',name:'AI Predictive Maintenance',desc:'IoT web app with Flask for real-time sensor monitoring and anomaly detection (ADXL345, DHT22, MPX5700AP). ML analytics.',tags:['Flask','InfluxDB','Docker','IoT','Embedded Systems','ML'],tc:'cyan'},
+  {emoji:'⚡',name:'ACCELERATOR',desc:'Hardware accelerators for optimized data processing using FPGA and ASIC architectures in VHDL/Verilog.',tags:['FPGA','ASIC','VHDL','Verilog','Hardware'],tc:'amber'},
+  {emoji:'📊',name:'Data Generator',desc:'VHDL-based random data generator for synthetic LLM training datasets.',tags:['VHDL','Verilog','LLM','Data Generation'],tc:'pink'},
+  {emoji:'🧪',name:'Automated Web Testing',desc:'Automated test suites for login and form validation using Robot Framework and Selenium WebDriver.',tags:['Robot Framework','Selenium','Python','Automation'],tc:'indigo'},
+  {emoji:'📚',name:'Library Management System',desc:'Java desktop application for managing books, borrowers and loans using Swing GUI and OOP/MVC architecture.',tags:['Java','Swing','MVC','OOP','Data Management'],tc:'pink'},
+];
+
+const education=[
+  {degree:'Electronics & Embedded Systems Engineering',school:'University of Tunis Manar',dates:'Sep 2021 – Jan 2024',score:'Engineer Diploma'},
+  {degree:'B.Sc. Electronics, Electrotechnology & Automation',school:'ISSAT Sousse',dates:'Sep 2018 – Jun 2021',score:"Bachelor's Degree"},
+  {degree:'Technical Sciences Baccalauréat',school:'2 Mars 1934 Sousse High School',dates:'Sep 2016 – Jun 2018',score:'13/20 (GPA 3.0)'},
+];
+
+const languages=[
+  {name:'Arabic',level:'Native',dot:'#f59e0b'},
+  {name:'French',level:'Bilingual',dot:'#06b6d4'},
+  {name:'English',level:'C1 Advanced',dot:'#4f46e5'},
+  {name:'German',level:'A2',dot:'#ec4899'},
+];
+
+const contacts=[
+  {icon:'📧',label:'Email',val:'mortahs99@gmail.com',bg:'rgba(79,70,229,.12)'},
+  {icon:'📱',label:'Phone',val:'+216 28 394 780',bg:'rgba(236,72,153,.12)'},
+  {icon:'📍',label:'Location',val:'Tunis / Sousse, Tunisia',bg:'rgba(6,182,212,.12)'},
+  {icon:'✈️',label:'Availability',val:'Open to Relocation',bg:'rgba(245,158,11,.12)'},
+  {icon:'💼',label:'GitHub',val:'github.com/HasnaouiMortadha',bg:'rgba(79,70,229,.12)'},
+  {icon:'🔗',label:'LinkedIn',val:'mortadha-hasnaoui',bg:'rgba(6,182,212,.12)'},
+];
+
+/* ── RENDER ─────────────────────────────────────── */
+// Skill bars
+const sbEl=document.getElementById('skillBars');
+skills.forEach(s=>{
+  sbEl.innerHTML+=`<div class="skill-item reveal fade-up">
+    <div class="skill-header"><span class="skill-name">${s.name}</span><span class="skill-pct">${s.pct}%</span></div>
+    <div class="skill-track"><div class="skill-fill" data-pct="${s.pct}" style="background:${s.color}"></div></div>
+  </div>`;
+});
+
+// Chip cloud
+const cc=document.getElementById('chipCloud');
+chips.forEach(c=>{cc.innerHTML+=`<span class="chip">${c}</span>`;});
+
+// Timeline
+const tl=document.getElementById('timeline');
+experience.forEach(e=>{
+  tl.innerHTML+=`<div class="timeline-item reveal slide-left">
+    <div class="timeline-dot"></div>
+    <div class="exp-meta"><span class="exp-company-name">${e.company}</span><span class="exp-date-loc">${e.loc}</span></div>
+    <div class="exp-title-main">${e.role}</div>
+    <p class="exp-desc">${e.desc}</p>
+    <div class="badge-row">${e.badges.map((b,i)=>`<span class="badge badge-${['indigo','pink','cyan','amber'][i%4]}">${b}</span>`).join('')}</div>
+  </div>`;
+});
+
+// Projects
+const pg=document.getElementById('projectsGrid');
+projects.forEach(p=>{
+  const cs={indigo:'rgba(79,70,229,.15)',cyan:'rgba(6,182,212,.15)',amber:'rgba(245,158,11,.15)',pink:'rgba(236,72,153,.15)'};
+  const ct={indigo:'#a5b4fc',cyan:'#67e8f9',amber:'#fcd34d',pink:'#f9a8d4'};
+  pg.innerHTML+=`<div class="proj-card reveal fade-up">
+    <span class="proj-emoji">${p.emoji}</span>
+    <div class="proj-name">${p.name}</div>
+    <p class="proj-desc">${p.desc}</p>
+    <div class="proj-tags">${p.tags.map(t=>`<span class="proj-tag" style="background:${cs[p.tc]};color:${ct[p.tc]};border:1px solid ${ct[p.tc]}33">${t}</span>`).join('')}</div>
+  </div>`;
+});
+
+// Education
+const eg=document.getElementById('eduGrid');
+education.forEach(e=>{
+  eg.innerHTML+=`<div class="edu-card reveal fade-up">
+    <div class="edu-degree">${e.degree}</div>
+    <div class="edu-school">${e.school}</div>
+    <div class="edu-dates">${e.dates}</div>
+    <span class="edu-score">${e.score}</span>
+  </div>`;
+});
+
+// Language badges
+const lb=document.getElementById('langBadges');
+languages.forEach(l=>{
+  lb.innerHTML+=`<div class="lang-badge"><div class="lang-dot" style="background:${l.dot};box-shadow:0 0 8px ${l.dot}"></div><span class="lang-badge-name">${l.name}</span><span class="lang-badge-level">${l.level}</span></div>`;
+});
+
+// Contact cards
+const cCards=document.getElementById('contactCards');
+contacts.forEach(c=>{
+  cCards.innerHTML+=`<div class="contact-card">
+    <div class="contact-icon" style="background:${c.bg}">${c.icon}</div>
+    <div><div class="contact-label">${c.label}</div><div class="contact-val">${c.val}</div></div>
+  </div>`;
+});
+
+/* ── LOADER ─────────────────────────────────────── */
+window.addEventListener('load',()=>{
+  setTimeout(()=>document.getElementById('loader').classList.add('hide'),2000);
+});
+
+/* ── CURSOR ──────────────────────────────────────── */
+const dot=document.getElementById('cursor-dot');
+const ring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  dot.style.left=mx+'px';dot.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}animRing();
+
+/* ── HAMBURGER ───────────────────────────────────── */
+function toggleMenu(){document.getElementById('navLinks').classList.toggle('open');}
+function closeMenu(){document.getElementById('navLinks').classList.remove('open');}
+
+/* ── INTERSECTION OBSERVER ───────────────────────── */
+const revealEls=document.querySelectorAll('.reveal');
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){en.target.classList.add('visible');io.unobserve(en.target);}
+  });
+},{threshold:.12});
+revealEls.forEach(el=>io.observe(el));
+
+// Skill bar observer
+const barEls=document.querySelectorAll('.skill-fill');
+const barIO=new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      const pct=en.target.dataset.pct;
+      en.target.style.width=pct+'%';
+      setTimeout(()=>en.target.classList.add('done'),1600);
+      barIO.unobserve(en.target);
+    }
+  });
+},{threshold:.5});
+barEls.forEach(el=>barIO.observe(el));
+
+/* ── PARTICLE CANVAS ─────────────────────────────── */
+const canvas=document.getElementById('particles');
+const ctx=canvas.getContext('2d');
+let W,H,particles2=[];
+const COLORS=['#4f46e5','#ec4899','#06b6d4','#f59e0b'];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();initParticles();});
+
+function Particle(){
+  this.x=Math.random()*W;
+  this.y=Math.random()*H;
+  this.vx=(Math.random()-.5)*.6;
+  this.vy=(Math.random()-.5)*.6;
+  this.r=Math.random()*2+1;
+  this.color=COLORS[Math.floor(Math.random()*COLORS.length)];
+}
+function initParticles(){
+  const n=Math.min(Math.floor((W*H)/12000),120);
+  particles2=[];
+  for(let i=0;i<n;i++)particles2.push(new Particle());
+}
+initParticles();
+
+function drawParticles(){
+  ctx.clearRect(0,0,W,H);
+  particles2.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.color+'99';
+    ctx.fill();
+  });
+  // connections
+  for(let i=0;i<particles2.length;i++){
+    for(let j=i+1;j<particles2.length;j++){
+      const dx=particles2[i].x-particles2[j].x;
+      const dy=particles2[i].y-particles2[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<120){
+        ctx.beginPath();
+        ctx.moveTo(particles2[i].x,particles2[i].y);
+        ctx.lineTo(particles2[j].x,particles2[j].y);
+        ctx.strokeStyle=particles2[i].color+(Math.floor((1-d/120)*60).toString(16).padStart(2,'0'));
+        ctx.lineWidth=.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+</script>
+</body>
+</html>
